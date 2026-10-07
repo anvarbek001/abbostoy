@@ -1,0 +1,341 @@
+/* App.css va invite-extra.css dan KEYIN ulanadi. Ularga tegmang. */
+
+/* ===== Kitob rejimi ===== */
+.app.is-book {
+  position: fixed;
+  inset: 0;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.book {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  perspective: 1400px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book::-webkit-scrollbar {
+  display: none;
+}
+
+.leaf {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: grid;
+  place-items: center;
+  padding: max(14px, env(safe-area-inset-top)) 14px 96px;
+}
+
+/* Sahifa varag'i */
+.leaf .paper {
+  width: min(94vw, 440px);
+  height: 100%;
+  max-height: 740px;
+  display: grid;
+  animation: none;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(60, 40, 10, 0.1), transparent 9%), var(--ivory);
+  transition:
+    transform 0.6s cubic-bezier(0.3, 0.7, 0.2, 1),
+    opacity 0.5s ease;
+}
+
+.leaf.before .paper {
+  transform: rotateY(28deg) scale(0.92);
+  transform-origin: left center;
+  opacity: 0.3;
+}
+
+.leaf.after .paper {
+  transform: rotateY(-28deg) scale(0.92);
+  transform-origin: right center;
+  opacity: 0.3;
+}
+
+.page-body {
+  position: relative;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-height: 0;
+  padding: clamp(46px, 12vw, 64px) clamp(26px, 8vw, 44px);
+  text-align: center;
+}
+
+.leaf .names {
+  font-size: clamp(48px, 15vw, 66px);
+}
+
+/* Elementlar faqat sahifa ochilganda paydo bo'ladi */
+.leaf:not(.active) .reveal {
+  animation: none;
+  opacity: 0;
+}
+
+.leaf .countdown,
+.leaf .date {
+  width: 100%;
+}
+
+.leaf .details {
+  width: 100%;
+  gap: 26px;
+  margin-bottom: 8px;
+}
+
+.leaf .divider {
+  margin: 22px auto;
+}
+
+.leaf .sign {
+  margin: 0;
+}
+
+.leaf .closing-text {
+  margin: 0;
+  font-size: 24px;
+  font-style: italic;
+  color: var(--gold-deep);
+}
+
+.leaf .closing-names {
+  margin: 8px 0 0;
+  font-family: var(--script);
+  font-size: clamp(42px, 13vw, 56px);
+  line-height: 1.2;
+  color: var(--emerald-800);
+}
+
+/* ===== Surat sahifalari ===== */
+.photo-page {
+  margin: 0;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 18px;
+}
+
+.photo-kicker {
+  margin: 0;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--gold-deep);
+}
+
+.photo-cap {
+  margin: 0;
+  font-family: var(--script);
+  font-size: clamp(32px, 9.5vw, 42px);
+  line-height: 1.15;
+  color: var(--emerald-800);
+}
+
+.photo-frame {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--gold);
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 3px var(--ivory),
+    0 12px 28px rgba(31, 51, 45, 0.25);
+  cursor: zoom-in;
+}
+
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: min(calc(100dvh - 330px), 470px);
+  min-height: 200px;
+  object-fit: cover;
+}
+
+/* Arka — ivory varaq ustida */
+.leaf .arch-wrap {
+  width: min(56vw, 250px);
+  margin: 6px auto 0;
+}
+
+.leaf .arch {
+  box-shadow:
+    0 0 0 6px var(--ivory),
+    0 0 0 7px rgba(200, 164, 93, 0.6),
+    0 18px 36px rgba(31, 51, 45, 0.3);
+}
+
+.leaf .spark {
+  background: var(--gold);
+}
+
+/* ===== Video ===== */
+.video-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: var(--emerald-900);
+  box-shadow:
+    0 0 0 5px var(--ivory),
+    0 0 0 6px rgba(200, 164, 93, 0.6),
+    0 14px 30px rgba(31, 51, 45, 0.3);
+}
+
+.video-box video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.video-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3c985, #c8a45d 55%, #b08a40);
+  color: var(--emerald-900);
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+.video-play svg {
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+}
+
+.video-play:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 3px;
+}
+
+/* ===== Pastki boshqaruv ===== */
+.book-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 10;
+  width: min(94vw, 440px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-btn {
+  flex: none;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3c985, #c8a45d 55%, #b08a40);
+  color: var(--emerald-900);
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transition:
+    transform 0.15s ease,
+    opacity 0.25s ease;
+}
+
+.nav-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.nav-btn:active {
+  transform: scale(0.94);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.nav-btn:focus-visible {
+  outline: 2px solid var(--ivory);
+  outline-offset: 3px;
+}
+
+.nav-btn.nudge {
+  animation: nudge 1.6s ease-in-out infinite;
+}
+
+.nav-mid {
+  flex: 1;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.nav-count {
+  font-size: 19px;
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.nav-bar {
+  width: 100%;
+  height: 2px;
+  background: rgba(200, 164, 93, 0.3);
+}
+
+.nav-bar i {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.4s ease;
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-height: 640px) {
+  .page-body {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .photo-frame img {
+    min-height: 160px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leaf.before .paper,
+  .leaf.after .paper {
+    transform: none;
+  }
+  .nav-btn.nudge {
+    animation: none;
+  }
+}

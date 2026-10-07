@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import "./invite-extra.css";
+import "./book.css";
 
 import foto1 from "./assets/photos/1.jpg";
 import foto2 from "./assets/photos/2.jpg";
 import foto3 from "./assets/photos/3.jpg";
 import foto4 from "./assets/photos/4.jpg";
 import foto5 from "./assets/photos/5.jpg";
+
+// To'yxona suratlari: src/assets/venue/ papkasiga 1.jpg ... 4.jpg qo'ying
+import venue1 from "./assets/venue/1.jpg";
+import venue2 from "./assets/venue/2.jpg";
+import venue3 from "./assets/venue/3.jpg";
+import venue4 from "./assets/venue/4.jpg";
 
 // ====== Taklifnoma ma'lumotlarini shu yerdan o'zgartiring ======
 const INVITE = {
@@ -20,7 +27,7 @@ const INVITE = {
   month: "Noyabr",
   year: "2026",
   time: "17:00",
-  iso: "2026-11-15T17:00:00", // hisoblagich uchun aniq sana va vaqt
+  iso: "2026-11-15T17:00:00",
   place: "Beksaroy to'yxonasi",
   address: "",
   sign: "Berkinovlar oilasi",
@@ -36,35 +43,35 @@ const HERO = {
 const MOMENTS = [
   {
     src: foto1,
-    rot: -3,
     cap: "Ikki yurak, bitta taqdir",
     alt: "Kelin-kuyov quchoqlashib turibdi",
   },
-  {
-    src: foto3,
-    rot: 2.5,
-    cap: "Baxt satrlari",
-    alt: "Kelin guvohnomaga qarab turibdi",
-  },
-  {
-    src: foto2,
-    rot: 3,
-    cap: "Qalbdagi va'da",
-    alt: "Kelin-kuyov guldasta bilan",
-  },
+  { src: foto3, cap: "Baxt satrlari", alt: "Kelin guvohnomaga qarab turibdi" },
+  { src: foto2, cap: "Qalbdagi va'da", alt: "Kelin-kuyov guldasta bilan" },
   {
     src: foto4,
-    rot: -2.5,
     cap: "Gullar ichida sevgi",
     alt: "Kelin kuyovning yelkasiga qo'lini qo'ygan",
   },
 ];
 
-const OPEN_DELAY = 1400; // konvert ochilish animatsiyasi (ms)
+// ====== To'yxona ======
+const VENUE_PHOTOS = [
+  { src: venue1, cap: "Tantana zali", alt: "To'yxona zali" },
+  { src: venue2, cap: "Bezatilgan stollar", alt: "To'yxona stollari" },
+  { src: venue3, cap: "Kirish qismi", alt: "To'yxona kirish qismi" },
+  { src: venue4, cap: "Hovli va bog'", alt: "To'yxona hovlisi" },
+];
+
+// Katta video: src/ ichiga EMAS, public/video/toyxona.mp4 ga qo'ying
+const VENUE_VIDEO = "/video/toyxona.mp4";
+const VENUE_POSTER = venue1;
+
+const OPEN_DELAY = 1400;
 const monogram = `${INVITE.groom[0]}&${INVITE.bride[0]}`;
 const TARGET = new Date(INVITE.iso).getTime();
 
-/* ---------- Yordamchi hooklar ---------- */
+/* ---------- Hook ---------- */
 
 function useCountdown(target) {
   const left = () => Math.max(0, target - Date.now());
@@ -85,28 +92,7 @@ function useCountdown(target) {
   };
 }
 
-function useSeen() {
-  const ref = useRef(null);
-  const [seen, setSeen] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setSeen(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.2 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return [ref, seen];
-}
-
-/* ---------- Dekor elementlar (SVG) ---------- */
+/* ---------- Dekor (SVG) ---------- */
 
 function Sprig({ className = "" }) {
   const leaf = "M0 0 C 6 -9 18 -9 26 0 C 18 9 6 9 0 0Z";
@@ -264,9 +250,7 @@ function Countdown() {
   const { done, d, h, m, s } = useCountdown(TARGET);
   const p = (n) => String(n).padStart(2, "0");
 
-  if (done) {
-    return <p className="cd-done">To'y kuni keldi!</p>;
-  }
+  if (done) return <p className="cd-done">To'y kuni keldi!</p>;
 
   const cells = [
     [d, "kun"],
@@ -290,72 +274,85 @@ function Countdown() {
   );
 }
 
-/* ---------- 2-bosqich: taklifnoma varag'i ---------- */
+/* ---------- Kitob sahifalari ---------- */
 
-function Letter() {
-  let i = 0;
-  const r = () => ({ "--i": i++ });
-
+// Matnli sahifalar (burchaklarida novdalar bor)
+function IntroPage() {
   return (
-    <article className="paper" aria-live="polite">
-      <Sprig className="sprig-tl" />
-      <Sprig className="sprig-tr" />
-      <Sprig className="sprig-bl" />
-      <Sprig className="sprig-br" />
-
-      <div className="paper-body">
-        <p className="kicker reveal" style={r()}>
-          {INVITE.kicker}
-        </p>
-
-        <h1 className="names reveal" style={r()}>
-          <span>{INVITE.groom}</span>
-          <span className="amp">&amp;</span>
-          <span>{INVITE.bride}</span>
-        </h1>
-
-        <Divider />
-
-        <p className="greeting reveal" style={r()}>
-          {INVITE.greeting}
-        </p>
-
-        <div className="date reveal" style={r()}>
-          <p className="weekday">{INVITE.weekday}</p>
-          <div className="date-row">
-            <span>{INVITE.month}</span>
-            <strong>{INVITE.day}</strong>
-            <span>{INVITE.year}</span>
-          </div>
-        </div>
-
-        <div className="countdown reveal" style={r()}>
-          <Countdown />
-        </div>
-
-        <div className="details reveal" style={r()}>
-          <div className="detail">
-            <span className="detail-label">Vaqt</span>
-            <span className="detail-value">{INVITE.time}</span>
-          </div>
-          <div className="detail">
-            <span className="detail-label">Manzil</span>
-            <span className="detail-value">{INVITE.place}</span>
-            {INVITE.address && (
-              <span className="detail-sub">{INVITE.address}</span>
-            )}
-          </div>
-        </div>
-
-        <p className="sign reveal" style={r()}>
-          {INVITE.sign}
-        </p>
-      </div>
-    </article>
+    <>
+      <p className="kicker reveal" style={{ "--i": 0 }}>
+        {INVITE.kicker}
+      </p>
+      <h1 className="names reveal" style={{ "--i": 1 }}>
+        <span>{INVITE.groom}</span>
+        <span className="amp">&amp;</span>
+        <span>{INVITE.bride}</span>
+      </h1>
+      <Divider />
+      <p className="greeting reveal" style={{ "--i": 2 }}>
+        {INVITE.greeting}
+      </p>
+    </>
   );
 }
 
-/* ---------- 3-bosqich: kelin-kuyov suratlari ---------- */
+function DatePage() {
+  return (
+    <>
+      <div className="date reveal" style={{ "--i": 0 }}>
+        <p className="weekday">{INVITE.weekday}</p>
+        <div className="date-row">
+          <span>{INVITE.month}</span>
+          <strong>{INVITE.day}</strong>
+          <span>{INVITE.year}</span>
+        </div>
+      </div>
+      <div className="countdown reveal" style={{ "--i": 1 }}>
+        <Countdown />
+      </div>
+    </>
+  );
+}
+
+function DetailsPage() {
+  return (
+    <>
+      <div className="details reveal" style={{ "--i": 0 }}>
+        <div className="detail">
+          <span className="detail-label">Vaqt</span>
+          <span className="detail-value">{INVITE.time}</span>
+        </div>
+        <div className="detail">
+          <span className="detail-label">Manzil</span>
+          <span className="detail-value">{INVITE.place}</span>
+          {INVITE.address && (
+            <span className="detail-sub">{INVITE.address}</span>
+          )}
+        </div>
+      </div>
+      <Divider />
+      <p className="sign reveal" style={{ "--i": 1 }}>
+        {INVITE.sign}
+      </p>
+    </>
+  );
+}
+
+function ClosingPage() {
+  return (
+    <>
+      <Divider />
+      <p className="closing-text reveal" style={{ "--i": 0 }}>
+        Sizni kutib qolamiz
+      </p>
+      <p className="closing-names reveal" style={{ "--i": 1 }}>
+        {INVITE.groom} &amp; {INVITE.bride}
+      </p>
+    </>
+  );
+}
+
+/* Har bir surat — alohida sahifa */
 
 const SPARKS = [
   [6, 10, 0],
@@ -364,33 +361,15 @@ const SPARKS = [
   [100, 54, 0.4],
   [8, 88, 1.2],
   [94, 94, 2],
-  [50, -3, 0.6],
-  [46, 102, 1.4],
 ];
 
-function Moment({ item, onZoom }) {
-  const [ref, seen] = useSeen();
+function HeroPage({ active, onZoom }) {
   return (
-    <figure
-      ref={ref}
-      className={`pola ${seen ? "in" : ""}`}
-      style={{ "--rot": `${item.rot}deg` }}
-      onClick={() => onZoom(item)}
-    >
-      <img src={item.src} alt={item.alt} loading="lazy" />
-      <figcaption>{item.cap}</figcaption>
-    </figure>
-  );
-}
-
-function Story({ onZoom }) {
-  const [ref, seen] = useSeen();
-  return (
-    <section className="story" aria-label="Kelin-kuyov suratlari">
-      <p className="story-kicker">Ikki qalbni bir qilgan lahzalar</p>
-      <h2 className="story-title">Bizning hikoyamiz</h2>
-
-      <div ref={ref} className={`arch-wrap ${seen ? "in" : ""}`}>
+    <div className="photo-page">
+      <p className="photo-kicker reveal" style={{ "--i": 0 }}>
+        Bizning hikoyamiz
+      </p>
+      <div className={`arch-wrap ${active ? "in" : ""}`}>
         {SPARKS.map(([x, y, d], k) => (
           <i
             key={k}
@@ -403,40 +382,253 @@ function Story({ onZoom }) {
             <img src={HERO.src} alt={HERO.alt} />
           </div>
         </div>
-        <p className="arch-cap">{HERO.caption}</p>
       </div>
+      <p className="photo-cap reveal" style={{ "--i": 2 }}>
+        {HERO.caption}
+      </p>
+    </div>
+  );
+}
 
-      <div className="polas">
-        {MOMENTS.map((m) => (
-          <Moment key={m.src} item={m} onZoom={onZoom} />
-        ))}
-      </div>
-
-      <div className="closing">
-        <Divider />
-        <p className="closing-text">Sizni kutib qolamiz</p>
-        <p className="closing-names">
-          {INVITE.groom} &amp; {INVITE.bride}
+function PhotoPage({ item, label, onZoom }) {
+  return (
+    <figure className="photo-page">
+      {label && (
+        <p className="photo-kicker reveal" style={{ "--i": 0 }}>
+          {label}
         </p>
+      )}
+      <div
+        className="photo-frame reveal"
+        style={{ "--i": 1 }}
+        onClick={() => onZoom(item)}
+      >
+        <img src={item.src} alt={item.alt} loading="lazy" />
       </div>
-    </section>
+      <figcaption className="photo-cap reveal" style={{ "--i": 2 }}>
+        {item.cap}
+      </figcaption>
+    </figure>
+  );
+}
+
+/* Video sahifa (200 MB — faqat bosilganda yuklanadi) */
+
+function VideoPage({ active }) {
+  const ref = useRef(null);
+  const [started, setStarted] = useState(false);
+
+  // Sahifadan chiqilsa video to'xtaydi
+  useEffect(() => {
+    if (!active && ref.current) ref.current.pause();
+  }, [active]);
+
+  const play = () => {
+    const v = ref.current;
+    if (!v) return;
+    setStarted(true);
+    v.play().catch(() => {});
+  };
+
+  return (
+    <div className="photo-page">
+      <p className="photo-kicker reveal" style={{ "--i": 0 }}>
+        To'yxona bilan tanishing
+      </p>
+      <div className="video-box reveal" style={{ "--i": 1 }}>
+        <video
+          ref={ref}
+          src={VENUE_VIDEO}
+          poster={VENUE_POSTER}
+          preload="none"
+          playsInline
+          controls={started}
+          controlsList="nodownload"
+        />
+        {!started && (
+          <button
+            type="button"
+            className="video-play"
+            onClick={play}
+            aria-label="Videoni ijro etish"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+            </svg>
+          </button>
+        )}
+      </div>
+      <p className="photo-cap reveal" style={{ "--i": 2 }}>
+        {INVITE.place}
+      </p>
+    </div>
+  );
+}
+
+/* ---------- Kitob ---------- */
+
+function Book({ onZoom }) {
+  const ref = useRef(null);
+  const wheelLock = useRef(0);
+  const [index, setIndex] = useState(0);
+
+  // ornate: burchaklarda novdalar bo'ladi
+  const pages = [
+    { key: "intro", ornate: true, render: () => <IntroPage /> },
+    { key: "date", ornate: true, render: () => <DatePage /> },
+    { key: "details", ornate: true, render: () => <DetailsPage /> },
+    { key: "hero", render: (a) => <HeroPage active={a} onZoom={onZoom} /> },
+    ...MOMENTS.map((m, i) => ({
+      key: `m${i}`,
+      render: () => <PhotoPage item={m} onZoom={onZoom} />,
+    })),
+    ...VENUE_PHOTOS.map((v, i) => ({
+      key: `v${i}`,
+      render: () => (
+        <PhotoPage
+          item={v}
+          label={i === 0 ? INVITE.place : ""}
+          onZoom={onZoom}
+        />
+      ),
+    })),
+    { key: "video", render: (a) => <VideoPage active={a} /> },
+    { key: "end", ornate: true, render: () => <ClosingPage /> },
+  ];
+  const last = pages.length - 1;
+
+  const go = (i) => {
+    const el = ref.current;
+    if (!el) return;
+    const n = Math.max(0, Math.min(last, i));
+    el.scrollTo({ left: n * el.clientWidth, behavior: "smooth" });
+  };
+
+  const onScroll = () => {
+    const el = ref.current;
+    if (el) setIndex(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  const onWheel = (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || Math.abs(e.deltaY) < 20)
+      return;
+    const now = Date.now();
+    if (now - wheelLock.current < 700) return;
+    wheelLock.current = now;
+    go(index + (e.deltaY > 0 ? 1 : -1));
+  };
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "ArrowRight") go(index + 1);
+      if (e.key === "ArrowLeft") go(index - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [index]);
+
+  return (
+    <>
+      <div className="book" ref={ref} onScroll={onScroll} onWheel={onWheel}>
+        {pages.map((p, i) => {
+          const state = i === index ? "active" : i < index ? "before" : "after";
+          return (
+            <section
+              key={p.key}
+              className={`leaf ${state}`}
+              aria-hidden={i !== index}
+              aria-label={`${i + 1}-sahifa`}
+            >
+              <article className="paper page">
+                {p.ornate && (
+                  <>
+                    <Sprig className="sprig-tl" />
+                    <Sprig className="sprig-tr" />
+                    <Sprig className="sprig-bl" />
+                    <Sprig className="sprig-br" />
+                  </>
+                )}
+                <div className="page-body">{p.render(i === index)}</div>
+              </article>
+            </section>
+          );
+        })}
+      </div>
+
+      <nav className="book-nav" aria-label="Sahifalar">
+        <button
+          type="button"
+          className="nav-btn"
+          onClick={() => go(index - 1)}
+          disabled={index === 0}
+          aria-label="Oldingi sahifa"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15 5l-7 7 7 7"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
+        <div className="nav-mid">
+          <span className="nav-count">
+            {index + 1} / {pages.length}
+          </span>
+          <span className="nav-bar">
+            <i style={{ width: `${((index + 1) / pages.length) * 100}%` }} />
+          </span>
+        </div>
+
+        <button
+          type="button"
+          className={`nav-btn ${index === 0 ? "nudge" : ""}`}
+          onClick={() => go(index === last ? 0 : index + 1)}
+          aria-label={index === last ? "Boshiga qaytish" : "Keyingi sahifa"}
+        >
+          {index === last ? (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 5l7 7-7 7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </button>
+      </nav>
+    </>
   );
 }
 
 /* ---------- Asosiy komponent ---------- */
 
 function App() {
-  // "envelope" -> "letter"
-  const [page, setPage] = useState("envelope");
+  const [page, setPage] = useState("envelope"); // "envelope" -> "book"
   const [opening, setOpening] = useState(false);
   const [zoom, setZoom] = useState(null);
 
   useEffect(() => {
     if (!opening) return;
-    const id = setTimeout(() => {
-      setPage("letter");
-      window.scrollTo({ top: 0 });
-    }, OPEN_DELAY);
+    const id = setTimeout(() => setPage("book"), OPEN_DELAY);
     return () => clearTimeout(id);
   }, [opening]);
 
@@ -447,17 +639,12 @@ function App() {
   }, []);
 
   return (
-    <main className={`app ${page === "letter" ? "is-scroll" : ""}`}>
+    <main className={`app ${page === "book" ? "is-book" : ""}`}>
       {page === "envelope" && (
         <Envelope open={opening} onOpen={() => setOpening(true)} />
       )}
 
-      {page === "letter" && (
-        <div className="stack">
-          <Letter />
-          <Story onZoom={setZoom} />
-        </div>
-      )}
+      {page === "book" && <Book onZoom={setZoom} />}
 
       {zoom && (
         <div
