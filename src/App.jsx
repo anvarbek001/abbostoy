@@ -13,12 +13,11 @@ import foto5 from "./assets/photos/5.jpg";
 import venue1 from "./assets/venue/1.jpg";
 import venue2 from "./assets/venue/2.jpg";
 import venue3 from "./assets/venue/3.jpg";
-import venue4 from "./assets/venue/4.jpg";
 
 // ====== Taklifnoma ma'lumotlarini shu yerdan o'zgartiring ======
 const INVITE = {
   groom: "Abbosbek",
-  bride: "Marjonaoy",
+  bride: "Marjona",
   kicker: "Nikoh to'yiga taklifnoma",
   greeting:
     "Hayotimizdagi eng baxtli kunni siz bilan baham ko'rishni istaymiz. Aziz mehmonimiz, tantanamizga tashrif buyurib, quvonchimizga sherik bo'lishingizni so'raymiz.",
@@ -60,12 +59,7 @@ const VENUE_PHOTOS = [
   { src: venue1, cap: "Tantana zali", alt: "To'yxona zali" },
   { src: venue2, cap: "Bezatilgan stollar", alt: "To'yxona stollari" },
   { src: venue3, cap: "Kirish qismi", alt: "To'yxona kirish qismi" },
-  { src: venue4, cap: "Hovli va bog'", alt: "To'yxona hovlisi" },
 ];
-
-// Katta video: src/ ichiga EMAS, public/video/toyxona.mp4 ga qo'ying
-const VENUE_VIDEO = "/video/toyxona.mp4";
-const VENUE_POSTER = venue1;
 
 const OPEN_DELAY = 1400;
 const monogram = `${INVITE.groom[0]}&${INVITE.bride[0]}`;
@@ -412,57 +406,23 @@ function PhotoPage({ item, label, onZoom }) {
   );
 }
 
-/* Video sahifa (200 MB — faqat bosilganda yuklanadi) */
+/* Video sahifa: butun sahifani egallaydi (9:16) */
 
 function VideoPage({ active }) {
   const ref = useRef(null);
-  const [started, setStarted] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   // Sahifadan chiqilsa video to'xtaydi
   useEffect(() => {
     if (!active && ref.current) ref.current.pause();
   }, [active]);
 
-  const play = () => {
+  const toggle = () => {
     const v = ref.current;
     if (!v) return;
-    setStarted(true);
-    v.play().catch(() => {});
+    if (v.paused) v.play().catch(() => {});
+    else v.pause();
   };
-
-  return (
-    <div className="photo-page">
-      <p className="photo-kicker reveal" style={{ "--i": 0 }}>
-        To'yxona bilan tanishing
-      </p>
-      <div className="video-box reveal" style={{ "--i": 1 }}>
-        <video
-          ref={ref}
-          src={VENUE_VIDEO}
-          poster={VENUE_POSTER}
-          preload="none"
-          playsInline
-          controls={started}
-          controlsList="nodownload"
-        />
-        {!started && (
-          <button
-            type="button"
-            className="video-play"
-            onClick={play}
-            aria-label="Videoni ijro etish"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
-            </svg>
-          </button>
-        )}
-      </div>
-      <p className="photo-cap reveal" style={{ "--i": 2 }}>
-        {INVITE.place}
-      </p>
-    </div>
-  );
 }
 
 /* ---------- Kitob ---------- */
@@ -492,7 +452,6 @@ function Book({ onZoom }) {
         />
       ),
     })),
-    { key: "video", render: (a) => <VideoPage active={a} /> },
     { key: "end", ornate: true, render: () => <ClosingPage /> },
   ];
   const last = pages.length - 1;
@@ -535,27 +494,34 @@ function Book({ onZoom }) {
           return (
             <section
               key={p.key}
-              className={`leaf ${state}`}
+              className={`leaf ${state} ${p.bare ? "leaf-video" : ""}`}
               aria-hidden={i !== index}
               aria-label={`${i + 1}-sahifa`}
             >
-              <article className="paper page">
-                {p.ornate && (
-                  <>
-                    <Sprig className="sprig-tl" />
-                    <Sprig className="sprig-tr" />
-                    <Sprig className="sprig-bl" />
-                    <Sprig className="sprig-br" />
-                  </>
-                )}
-                <div className="page-body">{p.render(i === index)}</div>
-              </article>
+              {p.bare ? (
+                p.render(i === index)
+              ) : (
+                <article className="paper page">
+                  {p.ornate && (
+                    <>
+                      <Sprig className="sprig-tl" />
+                      <Sprig className="sprig-tr" />
+                      <Sprig className="sprig-bl" />
+                      <Sprig className="sprig-br" />
+                    </>
+                  )}
+                  <div className="page-body">{p.render(i === index)}</div>
+                </article>
+              )}
             </section>
           );
         })}
       </div>
 
-      <nav className="book-nav" aria-label="Sahifalar">
+      <nav
+        className={`book-nav ${pages[index]?.bare ? "on-video" : ""}`}
+        aria-label="Sahifalar"
+      >
         <button
           type="button"
           className="nav-btn"

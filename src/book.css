@@ -179,35 +179,62 @@
   background: var(--gold);
 }
 
-/* ===== Video ===== */
-.video-box {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  border: 1px solid var(--gold);
-  border-radius: 12px;
-  background: var(--emerald-900);
-  box-shadow:
-    0 0 0 5px var(--ivory),
-    0 0 0 6px rgba(200, 164, 93, 0.6),
-    0 14px 30px rgba(31, 51, 45, 0.3);
+/* ===== Video: butun sahifa (9:16) ===== */
+.leaf.leaf-video {
+  padding: 0;
 }
 
-.video-box video {
+.video-full {
+  position: relative;
+  height: 100%;
+  width: min(100vw, calc(100dvh * 9 / 16));
+  overflow: hidden;
+  background: var(--emerald-900);
+  box-shadow: 0 0 0 1px rgba(200, 164, 93, 0.5);
+  transition:
+    transform 0.6s cubic-bezier(0.3, 0.7, 0.2, 1),
+    opacity 0.5s ease;
+}
+
+.leaf-video.before .video-full {
+  transform: rotateY(28deg) scale(0.92);
+  transform-origin: left center;
+  opacity: 0.3;
+}
+
+.leaf-video.after .video-full {
+  transform: rotateY(-28deg) scale(0.92);
+  transform-origin: right center;
+  opacity: 0.3;
+}
+
+.video-full video {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   background: #000;
+  cursor: pointer;
+}
+
+/* Yuqori va pastki qorong'i soya: yozuv va tugmalar ko'rinishi uchun */
+.video-full::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(10, 38, 32, 0.45), transparent 22%),
+    linear-gradient(0deg, rgba(10, 38, 32, 0.8), transparent 26%);
 }
 
 .video-play {
   position: absolute;
+  z-index: 2;
   inset: 0;
   margin: auto;
-  width: 72px;
-  height: 72px;
+  width: 78px;
+  height: 78px;
   display: grid;
   place-items: center;
   padding: 0;
@@ -216,18 +243,34 @@
   background: linear-gradient(135deg, #e3c985, #c8a45d 55%, #b08a40);
   color: var(--emerald-900);
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
 }
 
 .video-play svg {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   margin-left: 4px;
 }
 
 .video-play:focus-visible {
   outline: 2px solid var(--ivory);
   outline-offset: 3px;
+}
+
+.video-title {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: max(28px, env(safe-area-inset-top));
+  margin: 0;
+  text-align: center;
+  font-family: var(--script);
+  font-size: clamp(36px, 11vw, 46px);
+  line-height: 1.1;
+  color: var(--gold-light);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }
 
 /* ===== Pastki boshqaruv ===== */
@@ -310,6 +353,11 @@
   transition: width 0.4s ease;
 }
 
+/* Video sahifasida tugmalar videoning ustida turadi */
+.book-nav.on-video .nav-count {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
 @keyframes nudge {
   0%,
   100% {
@@ -332,7 +380,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .leaf.before .paper,
-  .leaf.after .paper {
+  .leaf.after .paper,
+  .leaf-video.before .video-full,
+  .leaf-video.after .video-full {
     transform: none;
   }
   .nav-btn.nudge {
