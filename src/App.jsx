@@ -1,25 +1,110 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
+import "./invite-extra.css";
+
+import foto1 from "./assets/photos/1.jpg";
+import foto2 from "./assets/photos/2.jpg";
+import foto3 from "./assets/photos/3.jpg";
+import foto4 from "./assets/photos/4.jpg";
+import foto5 from "./assets/photos/5.jpg";
 
 // ====== Taklifnoma ma'lumotlarini shu yerdan o'zgartiring ======
 const INVITE = {
-  groom: "Akmal",
-  bride: "Dilnoza",
+  groom: "Abbosbek",
+  bride: "Marjonaoy",
   kicker: "Nikoh to'yiga taklifnoma",
   greeting:
     "Hayotimizdagi eng baxtli kunni siz bilan baham ko'rishni istaymiz. Aziz mehmonimiz, tantanamizga tashrif buyurib, quvonchimizga sherik bo'lishingizni so'raymiz.",
   weekday: "Yakshanba",
-  day: "20",
-  month: "Dekabr",
+  day: "15",
+  month: "Noyabr",
   year: "2026",
-  time: "18:00",
-  place: "Navro'z to'yxonasi",
-  address: "Toshkent shahri",
-  sign: "Karimovlar va Rahimovlar oilalari",
+  time: "17:00",
+  iso: "2026-11-15T17:00:00", // hisoblagich uchun aniq sana va vaqt
+  place: "Beksaroy to'yxonasi",
+  address: "",
+  sign: "Berkinovlar oilasi",
 };
+
+// ====== Suratlar va izohlar ======
+const HERO = {
+  src: foto5,
+  alt: `${INVITE.groom} va ${INVITE.bride}`,
+  caption: "Endi hamisha birga",
+};
+
+const MOMENTS = [
+  {
+    src: foto1,
+    rot: -3,
+    cap: "Ikki yurak, bitta taqdir",
+    alt: "Kelin-kuyov quchoqlashib turibdi",
+  },
+  {
+    src: foto3,
+    rot: 2.5,
+    cap: "Baxt satrlari",
+    alt: "Kelin guvohnomaga qarab turibdi",
+  },
+  {
+    src: foto2,
+    rot: 3,
+    cap: "Qalbdagi va'da",
+    alt: "Kelin-kuyov guldasta bilan",
+  },
+  {
+    src: foto4,
+    rot: -2.5,
+    cap: "Gullar ichida sevgi",
+    alt: "Kelin kuyovning yelkasiga qo'lini qo'ygan",
+  },
+];
 
 const OPEN_DELAY = 1400; // konvert ochilish animatsiyasi (ms)
 const monogram = `${INVITE.groom[0]}&${INVITE.bride[0]}`;
+const TARGET = new Date(INVITE.iso).getTime();
+
+/* ---------- Yordamchi hooklar ---------- */
+
+function useCountdown(target) {
+  const left = () => Math.max(0, target - Date.now());
+  const [ms, setMs] = useState(left);
+
+  useEffect(() => {
+    const id = setInterval(() => setMs(left()), 1000);
+    return () => clearInterval(id);
+  }, [target]);
+
+  const s = Math.floor(ms / 1000);
+  return {
+    done: ms === 0,
+    d: Math.floor(s / 86400),
+    h: Math.floor((s % 86400) / 3600),
+    m: Math.floor((s % 3600) / 60),
+    s: s % 60,
+  };
+}
+
+function useSeen() {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setSeen(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return [ref, seen];
+}
 
 /* ---------- Dekor elementlar (SVG) ---------- */
 
@@ -99,7 +184,6 @@ function Envelope({ open, onOpen }) {
           </span>
         </span>
 
-        {/* Konvertning old tomoni */}
         <svg
           className="env-pocket"
           viewBox="0 0 400 300"
@@ -113,7 +197,6 @@ function Envelope({ open, onOpen }) {
           </g>
         </svg>
 
-        {/* Qopqoq: old va orqa yuzi */}
         <span className="env-flap">
           <svg
             className="flap-face front"
@@ -175,9 +258,41 @@ function Envelope({ open, onOpen }) {
   );
 }
 
+/* ---------- To'ygacha qolgan vaqt ---------- */
+
+function Countdown() {
+  const { done, d, h, m, s } = useCountdown(TARGET);
+  const p = (n) => String(n).padStart(2, "0");
+
+  if (done) {
+    return <p className="cd-done">To'y kuni keldi!</p>;
+  }
+
+  const cells = [
+    [d, "kun"],
+    [p(h), "soat"],
+    [p(m), "daqiqa"],
+    [p(s), "soniya"],
+  ];
+
+  return (
+    <>
+      <p className="cd-label">To'ygacha qolgan vaqt</p>
+      <div className="cd-grid" role="timer" aria-live="off">
+        {cells.map(([v, label]) => (
+          <div className="cd-cell" key={label}>
+            <b>{v}</b>
+            <small>{label}</small>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 /* ---------- 2-bosqich: taklifnoma varag'i ---------- */
 
-function Letter({ onNext }) {
+function Letter() {
   let i = 0;
   const r = () => ({ "--i": i++ });
 
@@ -214,6 +329,10 @@ function Letter({ onNext }) {
           </div>
         </div>
 
+        <div className="countdown reveal" style={r()}>
+          <Countdown />
+        </div>
+
         <div className="details reveal" style={r()}>
           <div className="detail">
             <span className="detail-label">Vaqt</span>
@@ -222,44 +341,83 @@ function Letter({ onNext }) {
           <div className="detail">
             <span className="detail-label">Manzil</span>
             <span className="detail-value">{INVITE.place}</span>
-            <span className="detail-sub">{INVITE.address}</span>
+            {INVITE.address && (
+              <span className="detail-sub">{INVITE.address}</span>
+            )}
           </div>
         </div>
 
         <p className="sign reveal" style={r()}>
           {INVITE.sign}
         </p>
-
-        <button
-          type="button"
-          className="btn reveal"
-          style={r()}
-          onClick={onNext}
-        >
-          Davom etish
-        </button>
       </div>
     </article>
   );
 }
 
-/* ---------- 3-bosqich: boshqa sahifa ---------- */
+/* ---------- 3-bosqich: kelin-kuyov suratlari ---------- */
 
-function NextPage({ onBack }) {
+const SPARKS = [
+  [6, 10, 0],
+  [92, 4, 0.8],
+  [-2, 46, 1.6],
+  [100, 54, 0.4],
+  [8, 88, 1.2],
+  [94, 94, 2],
+  [50, -3, 0.6],
+  [46, 102, 1.4],
+];
+
+function Moment({ item, onZoom }) {
+  const [ref, seen] = useSeen();
   return (
-    <section className="paper next">
-      <Sprig className="sprig-tl" />
-      <Sprig className="sprig-tr" />
-      <div className="paper-body">
-        <h1 className="names single">Rahmat!</h1>
+    <figure
+      ref={ref}
+      className={`pola ${seen ? "in" : ""}`}
+      style={{ "--rot": `${item.rot}deg` }}
+      onClick={() => onZoom(item)}
+    >
+      <img src={item.src} alt={item.alt} loading="lazy" />
+      <figcaption>{item.cap}</figcaption>
+    </figure>
+  );
+}
+
+function Story({ onZoom }) {
+  const [ref, seen] = useSeen();
+  return (
+    <section className="story" aria-label="Kelin-kuyov suratlari">
+      <p className="story-kicker">Ikki qalbni bir qilgan lahzalar</p>
+      <h2 className="story-title">Bizning hikoyamiz</h2>
+
+      <div ref={ref} className={`arch-wrap ${seen ? "in" : ""}`}>
+        {SPARKS.map(([x, y, d], k) => (
+          <i
+            key={k}
+            className="spark"
+            style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` }}
+          />
+        ))}
+        <div className="arch" onClick={() => onZoom(HERO)}>
+          <div className="arch-in">
+            <img src={HERO.src} alt={HERO.alt} />
+          </div>
+        </div>
+        <p className="arch-cap">{HERO.caption}</p>
+      </div>
+
+      <div className="polas">
+        {MOMENTS.map((m) => (
+          <Moment key={m.src} item={m} onZoom={onZoom} />
+        ))}
+      </div>
+
+      <div className="closing">
         <Divider />
-        <p className="greeting">
-          Bu yerga tashrifni tasdiqlash, manzil xaritasi yoki tabrik qoldirish
-          bo'limini joylashtirishingiz mumkin.
+        <p className="closing-text">Sizni kutib qolamiz</p>
+        <p className="closing-names">
+          {INVITE.groom} &amp; {INVITE.bride}
         </p>
-        <button type="button" className="btn btn-ghost" onClick={onBack}>
-          Taklifnomaga qaytish
-        </button>
       </div>
     </section>
   );
@@ -268,28 +426,49 @@ function NextPage({ onBack }) {
 /* ---------- Asosiy komponent ---------- */
 
 function App() {
-  // "envelope" -> "letter" -> "next"
+  // "envelope" -> "letter"
   const [page, setPage] = useState("envelope");
   const [opening, setOpening] = useState(false);
+  const [zoom, setZoom] = useState(null);
 
   useEffect(() => {
     if (!opening) return;
-    const id = setTimeout(() => setPage("letter"), OPEN_DELAY);
+    const id = setTimeout(() => {
+      setPage("letter");
+      window.scrollTo({ top: 0 });
+    }, OPEN_DELAY);
     return () => clearTimeout(id);
   }, [opening]);
 
-  const goTo = (p) => {
-    setPage(p);
-    window.scrollTo({ top: 0 });
-  };
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && setZoom(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
-    <main className="app">
+    <main className={`app ${page === "letter" ? "is-scroll" : ""}`}>
       {page === "envelope" && (
         <Envelope open={opening} onOpen={() => setOpening(true)} />
       )}
-      {page === "letter" && <Letter onNext={() => goTo("next")} />}
-      {page === "next" && <NextPage onBack={() => goTo("letter")} />}
+
+      {page === "letter" && (
+        <div className="stack">
+          <Letter />
+          <Story onZoom={setZoom} />
+        </div>
+      )}
+
+      {zoom && (
+        <div
+          className="zoom"
+          onClick={() => setZoom(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <img src={zoom.src} alt={zoom.alt} />
+        </div>
+      )}
     </main>
   );
 }

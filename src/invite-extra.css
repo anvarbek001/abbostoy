@@ -1,0 +1,316 @@
+/* App.css dan KEYIN ulanadi (App.jsx da import qilingan). App.css ga tegmang. */
+
+/* Sahifa pastga aylanadigan bo'ladi */
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-repeat: no-repeat;
+}
+
+.app.is-scroll {
+  justify-content: flex-start;
+}
+
+.stack {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 72px;
+  padding: 8px 0 24px;
+}
+
+/* =============== TO'YGACHA QOLGAN VAQT =============== */
+
+.countdown {
+  margin-bottom: 26px;
+}
+
+.cd-label {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.cd-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.cd-cell {
+  padding: 10px 0 8px;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffaf0, #f4ead3);
+  box-shadow: inset 0 0 0 3px var(--ivory);
+}
+
+.cd-cell b {
+  display: block;
+  font-size: clamp(28px, 9vw, 36px);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--emerald-800);
+  font-variant-numeric: tabular-nums;
+}
+
+.cd-cell small {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.cd-done {
+  margin: 0;
+  font-family: var(--script);
+  font-size: 36px;
+  color: var(--gold-deep);
+}
+
+/* =============== BIZNING HIKOYAMIZ =============== */
+
+.story {
+  width: min(92vw, 440px);
+  text-align: center;
+  color: var(--ivory);
+}
+
+.story-kicker {
+  margin: 0;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--gold-light);
+  opacity: 0.85;
+}
+
+.story-title {
+  margin: 4px 0 0;
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: clamp(46px, 14vw, 60px);
+  line-height: 1.1;
+  color: var(--gold-light);
+}
+
+/* Arka shaklidagi ramka */
+.arch-wrap {
+  position: relative;
+  width: min(74vw, 320px);
+  margin: 36px auto 0;
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s ease,
+    transform 0.9s ease;
+}
+
+.arch-wrap.in {
+  opacity: 1;
+  transform: none;
+}
+
+.arch {
+  position: relative;
+  aspect-ratio: 3 / 4.3;
+  padding: 10px;
+  border: 1px solid var(--gold);
+  border-radius: 999px 999px 14px 14px;
+  background: rgba(200, 164, 93, 0.08);
+  cursor: zoom-in;
+  box-shadow:
+    0 0 0 8px rgba(10, 38, 32, 1),
+    0 0 0 9px rgba(200, 164, 93, 0.45),
+    0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.arch-in {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 999px 999px 8px 8px;
+}
+
+.arch img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  animation: breathe 14s ease-in-out infinite alternate;
+}
+
+.arch-cap {
+  margin: 26px 0 0;
+  font-family: var(--script);
+  font-size: clamp(30px, 9vw, 38px);
+  color: var(--gold-light);
+}
+
+/* Yaltirab turuvchi yulduzchalar */
+.spark {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  background: var(--gold-light);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+  animation: twinkle 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Polaroid suratlar */
+.polas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 16px;
+  margin-top: 56px;
+  align-items: start;
+}
+
+.pola {
+  position: relative;
+  margin: 0;
+  padding: 8px 8px 12px;
+  background: var(--ivory);
+  border-radius: 3px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  color: var(--emerald-800);
+  cursor: zoom-in;
+  opacity: 0;
+  transform: translateY(34px) rotate(var(--rot, 0deg));
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.pola:nth-child(even) {
+  margin-top: 30px;
+}
+
+.pola.in {
+  opacity: 1;
+  transform: rotate(var(--rot, 0deg));
+}
+
+.pola.in:hover {
+  transform: rotate(0deg) scale(1.04);
+  z-index: 2;
+}
+
+/* Oltin lenta */
+.pola::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 54px;
+  height: 18px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: linear-gradient(135deg, rgba(230, 207, 152, 0.9), rgba(200, 164, 93, 0.75));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.pola img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.pola figcaption {
+  margin-top: 8px;
+  font-family: var(--script);
+  font-size: clamp(19px, 5.4vw, 23px);
+  line-height: 1.15;
+}
+
+/* Yakuniy qism */
+.closing {
+  margin-top: 64px;
+}
+
+.closing .divider {
+  color: var(--gold);
+}
+
+.closing-text {
+  margin: 0;
+  font-size: 22px;
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.closing-names {
+  margin: 6px 0 0;
+  font-family: var(--script);
+  font-size: clamp(36px, 11vw, 46px);
+  line-height: 1.2;
+  color: var(--ivory);
+}
+
+/* Suratni kattalashtirish */
+.zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 20, 16, 0.94);
+  cursor: zoom-out;
+  animation: rise 0.3s ease both;
+}
+
+.zoom img {
+  max-width: 100%;
+  max-height: 90vh;
+  max-height: 90dvh;
+  border-radius: 6px;
+  border: 1px solid var(--gold);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@keyframes breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+
+@media (min-width: 768px) {
+  .cd-grid {
+    gap: 12px;
+  }
+  .polas {
+    gap: 34px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arch-wrap,
+  .pola {
+    opacity: 1;
+    transform: rotate(var(--rot, 0deg));
+  }
+  .spark {
+    opacity: 0.8;
+  }
+}
