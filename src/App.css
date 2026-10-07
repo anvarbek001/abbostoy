@@ -1,0 +1,511 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Pinyon+Script&display=swap");
+
+:root {
+  --emerald-900: #0a2620;
+  --emerald-800: #0f3a30;
+  --emerald-600: #1b6150;
+  --gold: #c8a45d;
+  --gold-light: #e6cf98;
+  --gold-deep: #9c7a35;
+  --ivory: #fbf7ef;
+  --ink: #1f332d;
+  --muted: #6a7a73;
+  --script: "Pinyon Script", "Snell Roundhand", cursive;
+  --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--emerald-900);
+  color: var(--ink);
+  font-family: var(--serif);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px
+    max(28px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(
+      ellipse 90% 60% at 50% 18%,
+      #1d6150 0%,
+      rgba(15, 58, 48, 0.6) 45%,
+      transparent 75%
+    ),
+    var(--emerald-900);
+}
+
+/* =============== KONVERT =============== */
+
+.stage-envelope {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 34px;
+  padding-top: clamp(48px, 16vw, 90px);
+  transition:
+    transform 0.7s ease 0.75s,
+    opacity 0.55s ease 0.85s;
+}
+
+.stage-envelope.is-leaving {
+  transform: translateY(26px) scale(0.97);
+  opacity: 0;
+}
+
+.envelope {
+  position: relative;
+  width: min(88vw, 400px);
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1000px;
+  font: inherit;
+}
+
+.envelope:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 10px;
+  border-radius: 8px;
+}
+
+.env-back {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #d8cdb5;
+  border-radius: 4px;
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(200, 164, 93, 0.5);
+}
+
+.env-letter {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 7%;
+  bottom: 12%;
+  z-index: 1;
+  display: grid;
+  place-items: start center;
+  padding-top: 12%;
+  background: var(--ivory);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 5px var(--ivory),
+    inset 0 0 0 6px rgba(200, 164, 93, 0.7);
+  transition: transform 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) 0.45s;
+}
+
+.env-letter-names {
+  font-family: var(--script);
+  font-size: clamp(24px, 7.5vw, 34px);
+  color: var(--emerald-800);
+  white-space: nowrap;
+}
+
+.env-letter-names i {
+  font-style: normal;
+  color: var(--gold-deep);
+  padding: 0 0.1em;
+}
+
+.open .env-letter {
+  transform: translateY(-46%);
+}
+
+.env-pocket {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Qopqoq: 3D aylanadi, orqa yuzi zumraddek yashil */
+.env-flap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 55%;
+  z-index: 3;
+  transform-style: preserve-3d;
+  transform-origin: top center;
+  transition:
+    transform 0.7s ease,
+    z-index 0s linear 0.32s;
+}
+
+.flap-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.flap-face.back {
+  transform: rotateX(180deg);
+}
+
+.open .env-flap {
+  transform: rotateX(180deg);
+  z-index: 0;
+}
+
+/* Oltin muhr */
+.env-seal {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 55%;
+  width: clamp(54px, 15vw, 64px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -55%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(
+    circle at 32% 28%,
+    #f0dca6 0%,
+    #cfaa5f 45%,
+    #9c7a35 100%
+  );
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.18);
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s ease;
+}
+
+.env-seal-inner {
+  display: grid;
+  place-items: center;
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+  border: 1px solid rgba(80, 55, 15, 0.55);
+  font-family: var(--script);
+  font-size: clamp(16px, 4.6vw, 20px);
+  color: #4b3512;
+  line-height: 1;
+}
+
+.open .env-seal {
+  opacity: 0;
+  transform: translate(-50%, -55%) scale(1.25);
+}
+
+.hint {
+  margin: 0;
+  color: var(--gold-light);
+  font-size: 19px;
+  font-style: italic;
+  transition: opacity 0.3s ease;
+}
+
+.hint-hidden {
+  opacity: 0;
+}
+
+/* =============== TAKLIFNOMA VARAG'I =============== */
+
+.paper {
+  position: relative;
+  width: min(92vw, 440px);
+  background: var(--ivory);
+  border-radius: 4px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  transform-origin: top center;
+  animation: unfold 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Qo'sh oltin ramka */
+.paper::before,
+.paper::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid var(--gold);
+}
+
+.paper::before {
+  inset: 10px;
+}
+
+.paper::after {
+  inset: 15px;
+  opacity: 0.45;
+}
+
+.sprig {
+  position: absolute;
+  width: clamp(72px, 23vw, 104px);
+  height: auto;
+  color: var(--gold);
+  pointer-events: none;
+}
+
+.sprig-tl {
+  top: 14px;
+  left: 14px;
+}
+
+.sprig-tr {
+  top: 14px;
+  right: 14px;
+  transform: scaleX(-1);
+}
+
+.sprig-bl {
+  bottom: 14px;
+  left: 14px;
+  transform: scaleY(-1);
+}
+
+.sprig-br {
+  bottom: 14px;
+  right: 14px;
+  transform: scale(-1, -1);
+}
+
+.paper-body {
+  position: relative;
+  padding: clamp(60px, 18vw, 84px) clamp(30px, 9vw, 52px)
+    clamp(64px, 18vw, 84px);
+  text-align: center;
+}
+
+.kicker {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--gold-deep);
+}
+
+.names {
+  margin: 0;
+  display: grid;
+  gap: 0;
+  font-family: var(--script);
+  font-weight: 400;
+  font-size: clamp(52px, 17vw, 72px);
+  line-height: 1.05;
+  color: var(--emerald-800);
+}
+
+.names .amp {
+  font-size: 0.5em;
+  line-height: 1.1;
+  color: var(--gold);
+}
+
+.names.single {
+  font-size: clamp(48px, 15vw, 64px);
+}
+
+.divider {
+  display: block;
+  width: 150px;
+  height: auto;
+  margin: 18px auto 20px;
+  color: var(--gold);
+}
+
+.greeting {
+  margin: 0 0 24px;
+  font-size: clamp(18px, 5vw, 20px);
+  line-height: 1.55;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* Sana */
+.date {
+  margin-bottom: 22px;
+}
+
+.weekday {
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.date-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0;
+  font-size: 21px;
+  font-weight: 500;
+  color: var(--emerald-800);
+}
+
+.date-row span {
+  padding: 6px 0;
+}
+
+.date-row span:first-child {
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+}
+
+.date-row span:last-child {
+  border-top: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+}
+
+.date-row strong {
+  padding: 0 18px;
+  font-size: clamp(54px, 17vw, 72px);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--gold-deep);
+}
+
+/* Vaqt va manzil */
+.details {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.detail {
+  display: grid;
+  gap: 1px;
+}
+
+.detail-label {
+  font-size: 17px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.detail-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--emerald-800);
+}
+
+.detail-sub {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.sign {
+  margin: 0 0 28px;
+  font-family: var(--script);
+  font-size: clamp(24px, 7vw, 30px);
+  line-height: 1.25;
+  color: var(--gold-deep);
+}
+
+/* =============== TUGMA =============== */
+
+.btn {
+  display: inline-block;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 28px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #e3c985 0%, #c8a45d 55%, #b08a40 100%);
+  color: var(--emerald-900);
+  font: 600 20px var(--serif);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(156, 122, 53, 0.35);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--emerald-800);
+  outline-offset: 3px;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--emerald-800);
+  box-shadow: none;
+}
+
+/* =============== ANIMATSIYALAR =============== */
+
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scaleY(0.15);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal {
+  animation: rise 0.7s ease both;
+  animation-delay: calc(0.45s + var(--i, 0) * 0.1s);
+}
+
+@media (min-width: 768px) {
+  .details {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .btn {
+    width: auto;
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 340px) {
+  .date-row span {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+}
